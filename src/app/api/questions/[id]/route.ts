@@ -30,11 +30,12 @@ async function setQuestions(newQuestions: Question[]): Promise<void> {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const allQuestions = await getQuestions();
-    const question = allQuestions.find((q) => q.id === params.id);
+    const question = allQuestions.find((q) => q.id === id);
 
     if (!question) {
       return NextResponse.json(
@@ -58,13 +59,14 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const payload: UpdateQuestionPayload = await request.json();
     const allQuestions = await getQuestions();
 
-    const questionIndex = allQuestions.findIndex((q) => q.id === params.id);
+    const questionIndex = allQuestions.findIndex((q) => q.id === id);
 
     if (questionIndex === -1) {
       return NextResponse.json(
@@ -83,7 +85,7 @@ export async function PUT(
     if (Array.isArray(payload.alternatives)) {
       question.alternatives = payload.alternatives.map((alt) => ({
         ...alt,
-        id: alt.id || generateId(),
+        id: generateId(),
       }));
     }
 
@@ -106,13 +108,14 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     let allQuestions = await getQuestions();
     const initialLength = allQuestions.length;
 
-    allQuestions = allQuestions.filter((q) => q.id !== params.id);
+    allQuestions = allQuestions.filter((q) => q.id !== id);
 
     if (allQuestions.length === initialLength) {
       return NextResponse.json(

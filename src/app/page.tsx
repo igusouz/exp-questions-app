@@ -1,65 +1,138 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from 'react';
+import QuestionForm from '@/components/QuestionForm';
+import QuestionList from '@/components/QuestionList';
+import { Question, Alternative } from '@/lib/types';
 
 export default function Home() {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [editingQuestion, setEditingQuestion] = useState<Question | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Fetch all questions on mount
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  const fetchQuestions = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/questions');
+      if (!response.ok) throw new Error('Failed to fetch questions');
+      const data = await response.json();
+      setQuestions(data.data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch questions');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFormSubmit = async (formData: {
+    description: string;
+    alternatives: Omit<Alternative, 'id'>[];
+  }) => {
+    try {
+      setIsLoading(true);
+
+      if (editingQuestion) {
+        // Update existing question
+        const response = await fetch(`/api/questions/${editingQuestion.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) throw new Error('Failed to update question');
+        const data = await response.json();
+
+        setQuestions(
+          questions.map((q) => (q.id === editingQuestion.id ? data.data : q))
+        );
+      } else {
+        // Create new question
+        const response = await fetch('/api/questions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) throw new Error('Failed to create question');
+        const data = await response.json();
+        setQuestions([...questions, data.data]);
+      }
+
+      setEditingQuestion(undefined);
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (questionId: string) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/questions/${questionId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete question');
+
+      setQuestions(questions.filter((q) => q.id !== questionId));
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete question');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Questions Manager
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-gray-600">
+            Manage your closed questions and alternatives
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <QuestionForm
+              question={editingQuestion}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setEditingQuestion(undefined)}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+
+          <div className="lg:col-span-2">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">
+              Questions ({questions.length})
+            </h2>
+            <QuestionList
+              questions={questions}
+              onEdit={setEditingQuestion}
+              onDelete={handleDelete}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
