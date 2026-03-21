@@ -16,6 +16,15 @@ interface ExamListProps {
     gradingMode: 'strict' | 'lenient',
     csvContent: string
   ) => Promise<void>;
+  onGeneratePdfs: (payload: {
+    examId: string;
+    subject: string;
+    teacherName: string;
+    date: string;
+    copies: number;
+    studentName?: string;
+    studentCpf?: string;
+  }) => Promise<void>;
   gradeSummary?: {
     gradingMode: string;
     totalScore: number;
@@ -32,10 +41,17 @@ export default function ExamList({
   onDeleteExam,
   onDownloadAnswerKey,
   onGradeCsv,
+  onGeneratePdfs,
   gradeSummary,
 }: ExamListProps) {
   const [gradingMode, setGradingMode] = useState<'strict' | 'lenient'>('strict');
   const [csvInput, setCsvInput] = useState('');
+  const [subject, setSubject] = useState('');
+  const [teacherName, setTeacherName] = useState('');
+  const [examDate, setExamDate] = useState('');
+  const [copies, setCopies] = useState(1);
+  const [studentName, setStudentName] = useState('');
+  const [studentCpf, setStudentCpf] = useState('');
 
   const handleDelete = async (examId: string) => {
     const shouldDelete = window.confirm('Delete this exam?');
@@ -52,6 +68,22 @@ export default function ExamList({
     }
 
     await onGradeCsv(selectedExam.id, gradingMode, csvInput);
+  };
+
+  const handleGeneratePdfs = async () => {
+    if (!selectedExam) {
+      return;
+    }
+
+    await onGeneratePdfs({
+      examId: selectedExam.id,
+      subject,
+      teacherName,
+      date: examDate,
+      copies,
+      studentName,
+      studentCpf,
+    });
   };
 
   return (
@@ -147,6 +179,71 @@ export default function ExamList({
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-6 border-t border-gray-200 pt-4">
+            <h4 className="text-md font-bold text-gray-800 mb-2">Generate Randomized PDFs</h4>
+            <p className="text-xs text-gray-500 mb-2">
+              Header includes only Subject, Teacher and Date. Student info is placed at the end.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <input
+                value={subject}
+                onChange={(event) => setSubject(event.target.value)}
+                placeholder="Subject"
+                disabled={isLoading}
+                className="p-2 border border-gray-300 rounded text-sm"
+              />
+              <input
+                value={teacherName}
+                onChange={(event) => setTeacherName(event.target.value)}
+                placeholder="Teacher name"
+                disabled={isLoading}
+                className="p-2 border border-gray-300 rounded text-sm"
+              />
+              <input
+                value={examDate}
+                onChange={(event) => setExamDate(event.target.value)}
+                placeholder="Date"
+                disabled={isLoading}
+                className="p-2 border border-gray-300 rounded text-sm"
+              />
+              <input
+                type="number"
+                min={1}
+                max={100}
+                value={copies}
+                onChange={(event) => setCopies(Number(event.target.value || 1))}
+                placeholder="Copies"
+                disabled={isLoading}
+                className="p-2 border border-gray-300 rounded text-sm"
+              />
+              <input
+                value={studentName}
+                onChange={(event) => setStudentName(event.target.value)}
+                placeholder="Student name (optional)"
+                disabled={isLoading}
+                className="p-2 border border-gray-300 rounded text-sm"
+              />
+              <input
+                value={studentCpf}
+                onChange={(event) => setStudentCpf(event.target.value)}
+                placeholder="Student CPF (optional)"
+                disabled={isLoading}
+                className="p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+
+            <button
+              onClick={handleGeneratePdfs}
+              disabled={
+                isLoading || !subject.trim() || !teacherName.trim() || !examDate.trim()
+              }
+              className="mt-2 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 transition"
+            >
+              Generate PDFs (ZIP)
+            </button>
           </div>
 
           <div className="mt-6 border-t border-gray-200 pt-4">

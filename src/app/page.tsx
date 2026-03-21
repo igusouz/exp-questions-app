@@ -253,6 +253,53 @@ export default function Home() {
     }
   };
 
+  const handleGeneratePdfs = async (payload: {
+    examId: string;
+    subject: string;
+    teacherName: string;
+    date: string;
+    copies: number;
+    studentName?: string;
+    studentCpf?: string;
+  }) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/exams/${payload.examId}/generate-pdfs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: payload.subject,
+          teacherName: payload.teacherName,
+          date: payload.date,
+          copies: payload.copies,
+          studentName: payload.studentName,
+          studentCpf: payload.studentCpf,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to generate PDFs');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `exam-${payload.examId}-pdfs.zip`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate PDFs');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -311,6 +358,7 @@ export default function Home() {
               onDeleteExam={handleDeleteExam}
               onDownloadAnswerKey={handleDownloadAnswerKey}
               onGradeCsv={handleGradeCsv}
+              onGeneratePdfs={handleGeneratePdfs}
               gradeSummary={gradeSummary}
             />
           </div>

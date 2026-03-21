@@ -92,3 +92,16 @@ export function lenientLetterScore(expected: string[], received: string[]): numb
 
   return Math.max(0, (selectedCorrect - selectedWrong) / expected.length);
 }
+
+export function shuffleArray<T>(items: T[]): T[] {
+  const cloned = [...items];
+
+  for (let index = cloned.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    const current = cloned[index];
+    cloned[index] = cloned[randomIndex];
+    cloned[randomIndex] = current;
+  }
+
+  return cloned;
+}

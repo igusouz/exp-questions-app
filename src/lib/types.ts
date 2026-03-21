@@ -107,3 +107,12 @@ export interface GradeExamResult {
   percentage: number;
   results: QuestionGradeResult[];
 }
+
+export interface GenerateExamPdfsPayload {
+  subject: string;
+  teacherName: string;
+  date: string;
+  copies: number;
+  studentName?: string;
+  studentCpf?: string;
+}
