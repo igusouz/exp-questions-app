@@ -131,7 +131,7 @@ export default function ExamList({
       {selectedExam && (
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-800">Exam Preview: {selectedExam.title}</h3>
+            <h3 className="text-lg font-bold text-gray-900">Exam Preview: {selectedExam.title}</h3>
             <p className="text-sm text-gray-500">
               Created: {formatDate(selectedExam.createdAt)} · Mode:{' '}
               {selectedExam.identificationMode}
@@ -182,7 +182,7 @@ export default function ExamList({
           </div>
 
           <div className="mt-6 border-t border-gray-200 pt-4">
-            <h4 className="text-md font-bold text-gray-800 mb-2">Generate Randomized PDFs</h4>
+            <h4 className="text-md font-bold text-gray-900 mb-2">Generate Randomized PDFs</h4>
             <p className="text-xs text-gray-500 mb-2">
               Header includes only Subject, Teacher and Date. Student info is placed at the end.
             </p>
@@ -247,7 +247,7 @@ export default function ExamList({
           </div>
 
           <div className="mt-6 border-t border-gray-200 pt-4">
-            <h4 className="text-md font-bold text-gray-800 mb-2">Grade Student CSV</h4>
+            <h4 className="text-md font-bold text-gray-900 mb-2">Grade Student CSV</h4>
             <p className="text-xs text-gray-500 mb-2">
               CSV format: questionId,answer (optional header line)
             </p>

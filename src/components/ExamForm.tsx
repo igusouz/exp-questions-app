@@ -64,7 +64,7 @@ export default function ExamForm({
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Create Exam</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Create Exam</h2>
 
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded">
@@ -73,7 +73,7 @@ export default function ExamForm({
       )}
 
       <div className="mb-4">
-        <label className="block text-sm font-semibold mb-2">Exam Title</label>
+        <label className="block text-sm font-semibold mb-2 text-gray-800">Exam Title</label>
         <input
           value={title}
           onChange={(event) => setTitle(event.target.value)}
@@ -84,7 +84,7 @@ export default function ExamForm({
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-semibold mb-2">
+        <label className="block text-sm font-semibold mb-2 text-gray-800">
           Alternative Identification
         </label>
         <div className="flex gap-2">
@@ -116,7 +116,7 @@ export default function ExamForm({
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm font-semibold mb-2">
+        <label className="block text-sm font-semibold mb-2 text-gray-800">
           Select Questions ({selectedQuestionIds.length})
         </label>
         {questions.length === 0 ? (

@@ -117,7 +117,7 @@ export default function QuestionForm({
       onSubmit={handleSubmit}
       className="bg-white p-6 rounded-lg shadow-md"
     >
-      <h2 className="text-xl font-bold mb-4">
+      <h2 className="text-2xl font-bold mb-4 text-gray-900">
         {question ? 'Edit Question' : 'New Question'}
       </h2>
 
@@ -128,7 +128,7 @@ export default function QuestionForm({
       )}
 
       <div className="mb-4">
-        <label className="block text-sm font-semibold mb-2">
+        <label className="block text-sm font-semibold mb-2 text-gray-800">
           Question Description
         </label>
         <textarea
@@ -143,7 +143,7 @@ export default function QuestionForm({
 
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
-          <label className="block text-sm font-semibold">Alternatives</label>
+          <label className="block text-sm font-semibold text-gray-800">Alternatives</label>
           <button
             type="button"
             onClick={handleAddAlternative}

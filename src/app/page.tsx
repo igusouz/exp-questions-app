@@ -328,7 +328,7 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-2">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900">
               Questions ({questions.length})
             </h2>
             <QuestionList
