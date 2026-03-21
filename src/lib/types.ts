@@ -76,3 +76,34 @@ export interface ExamQuestionView {
 export interface ExamDetails extends Exam {
   questions: ExamQuestionView[];
 }
+
+export type GradingMode = 'strict' | 'lenient';
+
+export interface StudentAnswerRow {
+  questionId: string;
+  answer: string;
+}
+
+export interface GradeExamPayload {
+  gradingMode: GradingMode;
+  csvContent: string;
+}
+
+export interface QuestionGradeResult {
+  questionId: string;
+  expectedAnswer: string;
+  studentAnswer: string;
+  isCorrect: boolean;
+  score: number;
+  maxScore: number;
+}
+
+export interface GradeExamResult {
+  examId: string;
+  gradingMode: GradingMode;
+  totalQuestions: number;
+  totalScore: number;
+  maxScore: number;
+  percentage: number;
+  results: QuestionGradeResult[];
+}

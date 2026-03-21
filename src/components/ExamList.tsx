@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Exam, ExamDetails } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 
@@ -9,6 +10,18 @@ interface ExamListProps {
   isLoading: boolean;
   onViewExam: (examId: string) => Promise<void>;
   onDeleteExam: (examId: string) => Promise<void>;
+  onDownloadAnswerKey: (examId: string) => Promise<void>;
+  onGradeCsv: (
+    examId: string,
+    gradingMode: 'strict' | 'lenient',
+    csvContent: string
+  ) => Promise<void>;
+  gradeSummary?: {
+    gradingMode: string;
+    totalScore: number;
+    maxScore: number;
+    percentage: number;
+  };
 }
 
 export default function ExamList({
@@ -17,7 +30,13 @@ export default function ExamList({
   isLoading,
   onViewExam,
   onDeleteExam,
+  onDownloadAnswerKey,
+  onGradeCsv,
+  gradeSummary,
 }: ExamListProps) {
+  const [gradingMode, setGradingMode] = useState<'strict' | 'lenient'>('strict');
+  const [csvInput, setCsvInput] = useState('');
+
   const handleDelete = async (examId: string) => {
     const shouldDelete = window.confirm('Delete this exam?');
     if (!shouldDelete) {
@@ -25,6 +44,14 @@ export default function ExamList({
     }
 
     await onDeleteExam(examId);
+  };
+
+  const handleGrade = async () => {
+    if (!selectedExam) {
+      return;
+    }
+
+    await onGradeCsv(selectedExam.id, gradingMode, csvInput);
   };
 
   return (
@@ -77,6 +104,15 @@ export default function ExamList({
               Created: {formatDate(selectedExam.createdAt)} · Mode:{' '}
               {selectedExam.identificationMode}
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={() => onDownloadAnswerKey(selectedExam.id)}
+                disabled={isLoading}
+                className="px-3 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 disabled:opacity-50 transition"
+              >
+                Download Answer Key (CSV)
+              </button>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -111,6 +147,70 @@ export default function ExamList({
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-6 border-t border-gray-200 pt-4">
+            <h4 className="text-md font-bold text-gray-800 mb-2">Grade Student CSV</h4>
+            <p className="text-xs text-gray-500 mb-2">
+              CSV format: questionId,answer (optional header line)
+            </p>
+
+            <div className="flex flex-wrap gap-2 mb-2">
+              <button
+                type="button"
+                onClick={() => setGradingMode('strict')}
+                className={`px-3 py-2 text-sm rounded ${
+                  gradingMode === 'strict'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+              >
+                Strict
+              </button>
+              <button
+                type="button"
+                onClick={() => setGradingMode('lenient')}
+                className={`px-3 py-2 text-sm rounded ${
+                  gradingMode === 'lenient'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+              >
+                Lenient
+              </button>
+            </div>
+
+            <textarea
+              value={csvInput}
+              onChange={(event) => setCsvInput(event.target.value)}
+              placeholder="questionId,answer&#10;abc123,A|C&#10;def456,B"
+              rows={6}
+              disabled={isLoading}
+              className="w-full p-3 border border-gray-300 rounded-md font-mono text-sm"
+            />
+
+            <button
+              onClick={handleGrade}
+              disabled={isLoading || !csvInput.trim()}
+              className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition"
+            >
+              Grade CSV
+            </button>
+
+            {gradeSummary && (
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-900">
+                <p>
+                  Mode: <strong>{gradeSummary.gradingMode}</strong>
+                </p>
+                <p>
+                  Score: <strong>{gradeSummary.totalScore.toFixed(2)}</strong> /{' '}
+                  <strong>{gradeSummary.maxScore.toFixed(2)}</strong>
+                </p>
+                <p>
+                  Percentage: <strong>{gradeSummary.percentage.toFixed(2)}%</strong>
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

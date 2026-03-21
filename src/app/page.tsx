@@ -20,6 +20,15 @@ export default function Home() {
   const [editingQuestion, setEditingQuestion] = useState<Question | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [gradeSummary, setGradeSummary] = useState<
+    | {
+        gradingMode: string;
+        totalScore: number;
+        maxScore: number;
+        percentage: number;
+      }
+    | undefined
+  >();
 
   // Fetch all questions on mount
   useEffect(() => {
@@ -150,6 +159,7 @@ export default function Home() {
       if (!response.ok) throw new Error('Failed to load exam preview');
       const data = await response.json();
       setSelectedExam(data.data);
+      setGradeSummary(undefined);
       setError('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load exam preview');
@@ -176,9 +186,67 @@ export default function Home() {
 
         return undefined;
       });
+      setGradeSummary(undefined);
       setError('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete exam');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDownloadAnswerKey = async (examId: string) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/exams/${examId}/answer-key`);
+      if (!response.ok) throw new Error('Failed to download answer key');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `exam-${examId}-answer-key.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to download answer key');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGradeCsv = async (
+    examId: string,
+    gradingMode: 'strict' | 'lenient',
+    csvContent: string
+  ) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/exams/${examId}/grade`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gradingMode, csvContent }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to grade CSV answers');
+      }
+
+      setGradeSummary({
+        gradingMode: data.data.gradingMode,
+        totalScore: data.data.totalScore,
+        maxScore: data.data.maxScore,
+        percentage: data.data.percentage,
+      });
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to grade CSV answers');
       throw err;
     } finally {
       setIsLoading(false);
@@ -241,6 +309,9 @@ export default function Home() {
               isLoading={isLoading}
               onViewExam={handleViewExam}
               onDeleteExam={handleDeleteExam}
+              onDownloadAnswerKey={handleDownloadAnswerKey}
+              onGradeCsv={handleGradeCsv}
+              gradeSummary={gradeSummary}
             />
           </div>
         </div>
