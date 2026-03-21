@@ -3,10 +3,20 @@
 import { useEffect, useState } from 'react';
 import QuestionForm from '@/components/QuestionForm';
 import QuestionList from '@/components/QuestionList';
-import { Question, Alternative } from '@/lib/types';
+import ExamForm from '@/components/ExamForm';
+import ExamList from '@/components/ExamList';
+import {
+  Question,
+  Alternative,
+  Exam,
+  ExamDetails,
+  CreateExamPayload,
+} from '@/lib/types';
 
 export default function Home() {
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [selectedExam, setSelectedExam] = useState<ExamDetails | undefined>();
   const [editingQuestion, setEditingQuestion] = useState<Question | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -14,6 +24,7 @@ export default function Home() {
   // Fetch all questions on mount
   useEffect(() => {
     fetchQuestions();
+    fetchExams();
   }, []);
 
   const fetchQuestions = async () => {
@@ -25,6 +36,20 @@ export default function Home() {
       setQuestions(data.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch questions');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchExams = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/exams');
+      if (!response.ok) throw new Error('Failed to fetch exams');
+      const data = await response.json();
+      setExams(data.data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch exams');
     } finally {
       setIsLoading(false);
     }
@@ -93,9 +118,76 @@ export default function Home() {
     }
   };
 
+  const handleCreateExam = async (payload: CreateExamPayload) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/exams', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to create exam');
+      }
+
+      const data = await response.json();
+      setExams((current) => [...current, data.data]);
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create exam');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleViewExam = async (examId: string) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/exams/${examId}`);
+      if (!response.ok) throw new Error('Failed to load exam preview');
+      const data = await response.json();
+      setSelectedExam(data.data);
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load exam preview');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteExam = async (examId: string) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/exams/${examId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete exam');
+
+      setExams((current) => current.filter((exam) => exam.id !== examId));
+      setSelectedExam((current) => {
+        if (!current || current.id !== examId) {
+          return current;
+        }
+
+        return undefined;
+      });
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete exam');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             Questions Manager
@@ -111,7 +203,7 @@ export default function Home() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-1">
             <QuestionForm
               question={editingQuestion}
@@ -129,6 +221,26 @@ export default function Home() {
               onEdit={setEditingQuestion}
               onDelete={handleDelete}
               isLoading={isLoading}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <ExamForm
+              questions={questions}
+              isLoading={isLoading}
+              onSubmit={handleCreateExam}
+            />
+          </div>
+
+          <div className="lg:col-span-2">
+            <ExamList
+              exams={exams}
+              selectedExam={selectedExam}
+              isLoading={isLoading}
+              onViewExam={handleViewExam}
+              onDeleteExam={handleDeleteExam}
             />
           </div>
         </div>

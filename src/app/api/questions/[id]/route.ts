@@ -1,27 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Question, UpdateQuestionPayload } from '@/lib/types';
 import { generateId } from '@/lib/utils';
+import { getQuestionsStore, setQuestionsStore } from '@/lib/store';
 
-/**
- * Import questions from the main route
- * In production, this would use a database
- */
-let questions: Question[] = [];
-
-/**
- * Note: For a shared in-memory store, we're using a simple export from the parent route
- * In production, use a database for proper data persistence
- */
-
-// This is a workaround for accessing shared state
-// In production, use database queries instead
 async function getQuestions(): Promise<Question[]> {
-  // Simulate fetching from persistent storage
-  return questions;
+  return getQuestionsStore();
 }
 
 async function setQuestions(newQuestions: Question[]): Promise<void> {
-  questions = newQuestions;
+  setQuestionsStore(newQuestions);
 }
 
 /**

@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Question, CreateQuestionPayload } from '@/lib/types';
 import { generateId } from '@/lib/utils';
-
-/**
- * In-memory storage for questions
- * In production, this would be replaced with a database
- */
-let questions: Question[] = [];
+import { getQuestionsStore, setQuestionsStore } from '@/lib/store';
 
 /**
  * GET /api/questions
@@ -14,6 +9,7 @@ let questions: Question[] = [];
  */
 export async function GET() {
   try {
+    const questions = getQuestionsStore();
     return NextResponse.json({ status: 'success', data: questions });
   } catch (error) {
     return NextResponse.json(
@@ -29,6 +25,7 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const questions = getQuestionsStore();
     const payload: CreateQuestionPayload = await request.json();
 
     // Validate payload
@@ -52,6 +49,7 @@ export async function POST(request: NextRequest) {
     };
 
     questions.push(newQuestion);
+    setQuestionsStore(questions);
 
     return NextResponse.json(
       { status: 'success', data: newQuestion },
