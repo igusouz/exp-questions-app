@@ -135,7 +135,7 @@ export default function QuestionForm({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter the question description"
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 border border-gray-300 rounded-md placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows={3}
           disabled={isLoading}
         />
@@ -169,7 +169,7 @@ export default function QuestionForm({
                   }
                   placeholder="Alternative description"
                   disabled={isLoading}
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 

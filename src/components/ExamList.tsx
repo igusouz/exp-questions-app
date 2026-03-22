@@ -193,21 +193,21 @@ export default function ExamList({
                 onChange={(event) => setSubject(event.target.value)}
                 placeholder="Subject"
                 disabled={isLoading}
-                className="p-2 border border-gray-300 rounded text-sm"
+                className="p-2 border border-gray-300 rounded text-sm placeholder:text-gray-500"
               />
               <input
                 value={teacherName}
                 onChange={(event) => setTeacherName(event.target.value)}
                 placeholder="Teacher name"
                 disabled={isLoading}
-                className="p-2 border border-gray-300 rounded text-sm"
+                className="p-2 border border-gray-300 rounded text-sm placeholder:text-gray-500"
               />
               <input
                 value={examDate}
                 onChange={(event) => setExamDate(event.target.value)}
                 placeholder="Date"
                 disabled={isLoading}
-                className="p-2 border border-gray-300 rounded text-sm"
+                className="p-2 border border-gray-300 rounded text-sm placeholder:text-gray-500"
               />
               <input
                 type="number"
@@ -217,21 +217,21 @@ export default function ExamList({
                 onChange={(event) => setCopies(Number(event.target.value || 1))}
                 placeholder="Copies"
                 disabled={isLoading}
-                className="p-2 border border-gray-300 rounded text-sm"
+                className="p-2 border border-gray-300 rounded text-sm placeholder:text-gray-500"
               />
               <input
                 value={studentName}
                 onChange={(event) => setStudentName(event.target.value)}
                 placeholder="Student name (optional)"
                 disabled={isLoading}
-                className="p-2 border border-gray-300 rounded text-sm"
+                className="p-2 border border-gray-300 rounded text-sm placeholder:text-gray-500"
               />
               <input
                 value={studentCpf}
                 onChange={(event) => setStudentCpf(event.target.value)}
                 placeholder="Student CPF (optional)"
                 disabled={isLoading}
-                className="p-2 border border-gray-300 rounded text-sm"
+                className="p-2 border border-gray-300 rounded text-sm placeholder:text-gray-500"
               />
             </div>
 
@@ -283,7 +283,7 @@ export default function ExamList({
               placeholder="questionId,answer&#10;abc123,A|C&#10;def456,B"
               rows={6}
               disabled={isLoading}
-              className="w-full p-3 border border-gray-300 rounded-md font-mono text-sm"
+              className="w-full p-3 border border-gray-300 rounded-md font-mono text-sm placeholder:text-gray-500"
             />
 
             <button
