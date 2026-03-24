@@ -181,7 +181,7 @@ export default function QuestionForm({
                   disabled={isLoading}
                   className="w-4 h-4 cursor-pointer"
                 />
-                <span className="text-sm font-medium">Correct</span>
+                <span className="text-sm font-medium text-gray-800">Correct</span>
               </label>
 
               <button

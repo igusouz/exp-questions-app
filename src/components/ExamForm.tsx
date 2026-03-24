@@ -137,7 +137,7 @@ export default function ExamForm({
                   disabled={isLoading}
                   className="mt-1"
                 />
-                <span className="text-sm text-gray-700">{question.description}</span>
+                <span className="text-sm text-gray-800">{question.description}</span>
               </label>
             ))}
           </div>

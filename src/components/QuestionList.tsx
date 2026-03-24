@@ -83,7 +83,7 @@ export default function QuestionList({
                   }`}
                 >
                   <div className="flex justify-between items-center">
-                    <span>{alt.description}</span>
+                    <span className="text-gray-800">{alt.description}</span>
                     {alt.isCorrect && (
                       <span className="px-2 py-1 bg-green-500 text-white text-xs rounded font-semibold">
                         Correct
