@@ -14,6 +14,7 @@ import {
 } from '@/lib/types';
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<'questions' | 'exams'>('questions');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedExam, setSelectedExam] = useState<ExamDetails | undefined>();
@@ -312,57 +313,84 @@ export default function Home() {
           </p>
         </div>
 
+        <div className="mb-6 bg-white p-2 rounded-lg shadow-sm border border-gray-200 inline-flex gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('questions')}
+            className={`px-4 py-2 rounded-md text-sm font-semibold transition ${
+              activeTab === 'questions'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+            }`}
+          >
+            Questions
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('exams')}
+            className={`px-4 py-2 rounded-md text-sm font-semibold transition ${
+              activeTab === 'exams'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+            }`}
+          >
+            Exams
+          </button>
+        </div>
+
         {error && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-1">
-            <QuestionForm
-              question={editingQuestion}
-              onSubmit={handleFormSubmit}
-              onCancel={() => setEditingQuestion(undefined)}
-            />
-          </div>
+        {activeTab === 'questions' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-1">
+              <QuestionForm
+                question={editingQuestion}
+                onSubmit={handleFormSubmit}
+                onCancel={() => setEditingQuestion(undefined)}
+              />
+            </div>
 
-          <div className="lg:col-span-2">
-            <h2 className="text-2xl font-bold mb-4 text-gray-900">
-              Questions ({questions.length})
-            </h2>
-            <QuestionList
-              questions={questions}
-              onEdit={setEditingQuestion}
-              onDelete={handleDelete}
-              isLoading={isLoading}
-            />
+            <div className="lg:col-span-2">
+              <h2 className="text-2xl font-bold mb-4 text-gray-900">
+                Questions ({questions.length})
+              </h2>
+              <QuestionList
+                questions={questions}
+                onEdit={setEditingQuestion}
+                onDelete={handleDelete}
+                isLoading={isLoading}
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1">
+              <ExamForm
+                questions={questions}
+                isLoading={isLoading}
+                onSubmit={handleCreateExam}
+              />
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
-            <ExamForm
-              questions={questions}
-              isLoading={isLoading}
-              onSubmit={handleCreateExam}
-            />
+            <div className="lg:col-span-2">
+              <ExamList
+                exams={exams}
+                selectedExam={selectedExam}
+                isLoading={isLoading}
+                onViewExam={handleViewExam}
+                onDeleteExam={handleDeleteExam}
+                onDownloadAnswerKey={handleDownloadAnswerKey}
+                onGradeCsv={handleGradeCsv}
+                onGeneratePdfs={handleGeneratePdfs}
+                gradeSummary={gradeSummary}
+              />
+            </div>
           </div>
-
-          <div className="lg:col-span-2">
-            <ExamList
-              exams={exams}
-              selectedExam={selectedExam}
-              isLoading={isLoading}
-              onViewExam={handleViewExam}
-              onDeleteExam={handleDeleteExam}
-              onDownloadAnswerKey={handleDownloadAnswerKey}
-              onGradeCsv={handleGradeCsv}
-              onGeneratePdfs={handleGeneratePdfs}
-              gradeSummary={gradeSummary}
-            />
-          </div>
-        </div>
+        )}
       </div>
     </main>
   );
