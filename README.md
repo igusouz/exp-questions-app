@@ -20,6 +20,7 @@ Fullstack Next.js application to manage closed questions, create exams from thos
 - PDF generation in ZIP with randomized question/alternative order for N copies
 - Pre-populated seed data for quick local testing (questions + exams)
 - Unit tests for core utilities and store seed integrity
+- Acceptance tests with Gherkin/Cucumber for exam APIs
 
 ## Tech Stack
 
@@ -57,6 +58,11 @@ src/
     utils.ts
     store.test.ts
     utils.test.ts
+  acceptance/
+    features/
+      exam-management.feature
+    steps/
+      exam-management.steps.ts
 vitest.config.ts
 ```
 
@@ -154,6 +160,12 @@ Run tests in watch mode:
 
 ```bash
 npm run test:watch
+```
+
+Run acceptance tests (Gherkin/Cucumber):
+
+```bash
+npm run test:acceptance
 ```
 
 ## Notes
