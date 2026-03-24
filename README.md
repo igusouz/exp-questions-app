@@ -4,6 +4,9 @@ Fullstack Next.js application to manage closed questions, create exams from thos
 
 ## Features
 
+- Single landing page with tab navigation:
+  - `Questions` area
+  - `Exams` area
 - Question CRUD (create, read, update, delete)
 - Dynamic alternatives with `isCorrect` boolean
 - Exam creation from existing questions
@@ -15,6 +18,8 @@ Fullstack Next.js application to manage closed questions, create exams from thos
   - `strict` mode (all-or-nothing)
   - `lenient` mode (proportional)
 - PDF generation in ZIP with randomized question/alternative order for N copies
+- Pre-populated seed data for quick local testing (questions + exams)
+- Unit tests for core utilities and store seed integrity
 
 ## Tech Stack
 
@@ -50,6 +55,9 @@ src/
     types.ts
     store.ts
     utils.ts
+    store.test.ts
+    utils.test.ts
+vitest.config.ts
 ```
 
 ## Core Data Models
@@ -125,11 +133,27 @@ npm run dev
 
 Open http://localhost:3000
 
+Default startup includes sample questions/exams so CSV grading and PDF generation can be tested immediately.
+
 Production build:
 
 ```bash
 npm run build
 npm run start
+```
+
+## Testing
+
+Run unit tests:
+
+```bash
+npm test
+```
+
+Run tests in watch mode:
+
+```bash
+npm run test:watch
 ```
 
 ## Notes
